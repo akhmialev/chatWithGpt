@@ -37,8 +37,7 @@ def get_request(msg: str, request: Request, message_count: int = Depends(get_use
     save_messages()
 
     ip_message_count[client_ip] = message_count + 1
-    print(ip_message_count)
-    return answer
+    return {'message': answer}
 
 
 if __name__ == '__main__':
