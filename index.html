@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Chat</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div id="chat-container">
+    <div id="chat-log"></div>
+    <input type="text" id="message-input" placeholder="Введите сообщение..." required>
+    <button id="send-button">Отправить</button>
+    <div id="loading-indicator" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+</div>
+<script>
+        const chatLog = document.getElementById('chat-log');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        sendButton.addEventListener('click', () => {
+            const userMessage = messageInput.value;
+            if (userMessage.trim() === '') return;
+
+            chatLog.innerHTML += `<div><strong>Вы:</strong> ${userMessage}</div>`;
+            messageInput.value = '';
+
+            loadingIndicator.style.display = 'block'; // Показать индикатор загрузки
+
+            fetch(`http://127.0.0.1:8000/api/v1/?msg=${encodeURIComponent(userMessage)}`)
+                .then(response => response.text())
+                .then(answer => {
+                    chatLog.innerHTML += `<div><strong>Ассистент:</strong> ${answer}</div>`;
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                })
+                .catch(error => console.error('Ошибка при запросе:', error))
+                .finally(() => {
+                    loadingIndicator.style.display = 'none'; // Скрыть индикатор загрузки
+                });
+        });
+
+</script>
+</body>
+</html>
