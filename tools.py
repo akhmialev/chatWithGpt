@@ -7,7 +7,6 @@ messages = [
     {'role': 'system', 'content': 'Previous message'},
     {'role': 'user', 'content': ''}
 ]
-ip_message_count = {}
 
 
 def save_messages():

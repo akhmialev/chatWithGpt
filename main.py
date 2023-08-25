@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
-from tools import load_messages, save_messages, messages, get_user_ip, ip_message_count
+from tools import load_messages, save_messages, messages, get_user_ip
 from config import API_KEY
 
 openai.api_key = API_KEY
@@ -20,9 +20,8 @@ app.add_middleware(
 
 
 @app.get('/api/v1/')
-def get_request(msg: str, request: Request, message_count: int = Depends(get_user_ip)):
+def get_request(msg: str, message_count: int = Depends(get_user_ip)):
     load_messages()
-    client_ip = request.client.host
 
     if message_count:
         return {'message': 'Limit exceeded'}
@@ -36,7 +35,6 @@ def get_request(msg: str, request: Request, message_count: int = Depends(get_use
     messages.append({'role': 'assistant', 'content': answer})
     save_messages()
 
-    ip_message_count[client_ip] = message_count + 1
     return {'message': answer}
 
 
