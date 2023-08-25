@@ -5,8 +5,9 @@ const loadingIndicator = document.getElementById('loading-indicator');
 const authButtonContainer = document.getElementById('auth-button-container');
 const loginButton = document.getElementById('login-button');
 const registerButton = document.getElementById('register-button');
+const messageOverlay = document.getElementById('message-overlay');
+const closeButton = document.getElementById('close-button');
 
-// Функция для отправки сообщения
 function sendMessage() {
     const userMessage = messageInput.value;
     if (userMessage.trim() === '') return;
@@ -22,6 +23,7 @@ function sendMessage() {
         .then(data => {
             if (data.message === "Limit exceeded") {
                 authButtonContainer.style.display = 'block'; // Показать контейнер с кнопками
+                showMessageOverlay(); // Показать сообщение о регистрации/входе
             } else {
                 chatLog.innerHTML += `<div><strong>Ассистент:</strong> ${data.message}</div>`;
                 chatLog.scrollTop = chatLog.scrollHeight;
@@ -31,6 +33,15 @@ function sendMessage() {
         .finally(() => {
             loadingIndicator.style.display = 'none'; // Скрыть индикатор загрузки
         });
+}
+
+function showMessageOverlay() {
+    messageOverlay.style.display = 'flex';
+    closeButton.focus(); // Передаем фокус на кнопку "Закрыть" в окне
+}
+
+function hideMessageOverlay() {
+    messageOverlay.style.display = 'none';
 }
 
 // Обработчик нажатия Enter на поле ввода сообщения
@@ -46,9 +57,19 @@ sendButton.addEventListener('click', sendMessage);
 
 // Обработчики для кнопок Вход и Регистрация
 loginButton.addEventListener('click', () => {
-    // Ваш код для обработки кнопки Вход
+    showMessageOverlay();
 });
 
 registerButton.addEventListener('click', () => {
-    // Ваш код для обработки кнопки Регистрация
+    showMessageOverlay();
+});
+
+// Обработчик кнопки "Закрыть" в окне сообщения
+closeButton.addEventListener('click', hideMessageOverlay);
+
+// Обработчик нажатия Enter для кнопки закрытия
+closeButton.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        hideMessageOverlay(); // Вызываем функцию закрытия окна
+    }
 });
