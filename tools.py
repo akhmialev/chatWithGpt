@@ -1,6 +1,8 @@
 import json
 from fastapi import Request
 
+from db import check_db_max_count_ip
+
 messages = [
     {'role': 'system', 'content': 'Previous message'},
     {'role': 'user', 'content': ''}
@@ -23,5 +25,12 @@ def load_messages():
 
 
 def get_user_ip(request: Request):
+    """
+    Функция берет user id из request
+    """
     client_ip = request.client.host
-    return ip_message_count.get(client_ip, 0)
+    if check_db_max_count_ip(client_ip):
+        return True
+    else:
+        return False
+
