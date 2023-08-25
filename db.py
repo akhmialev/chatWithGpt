@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pymongo import MongoClient
 
 
@@ -16,23 +18,27 @@ def check_db_max_count_ip(ip):
     :param ip: user ip
     """
     db = connect_to_db()
+    today = datetime.today().date()
     collection = db.get_collection('users')
     query = {'ip': ip}
     user = collection.find_one(query)
     if user:
-        if int(user['count']) < 3:
-            query = {'ip': ip}
-            update_data = {'$set': {'count': user['count'] + 1}}
-            collection.update_one(query, update=update_data)
-            return False
+        if str(today) == str(user['date']):
+            if int(user['count']) < 3:
+                query = {'ip': ip}
+                update_data = {'$set': {'count': user['count'] + 1}}
+                collection.update_one(query, update=update_data)
+                return False
+            else:
+                return True
         else:
-            return True
+            update_date = {"$set": {'count': 1, 'date': str(today)}}
+            collection.update_one(query, update_date)
     else:
         data = {
             'ip': ip,
-            'count': 1
+            'count': 1,
+            'date': str(today)
         }
         collection.insert_one(data)
         return False
-
-
