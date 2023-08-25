@@ -24,7 +24,7 @@ def get_request(msg: str, request: Request, message_count: int = Depends(get_use
     load_messages()
     client_ip = request.client.host
 
-    if message_count >= 3:
+    if message_count:
         return {'message': 'Limit exceeded'}
 
     messages.append({'role': 'user', 'content': msg})
