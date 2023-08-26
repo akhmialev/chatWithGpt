@@ -1,6 +1,23 @@
 from fastapi import Request
+from fastapi.middleware.cors import CORSMiddleware
 
 from db import check_db_max_count_ip, load_msg, save_msg
+
+
+def add_middleware(app):
+    """
+        Функция для разрешения запросов с других доменов
+    """
+    origins = ["*"]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    return app
 
 
 def save_messages(request, msg, answer):
@@ -20,7 +37,7 @@ def save_messages(request, msg, answer):
 
 def load_messages(request):
     """
-    Функция для загрузки истории сообщений, что бы ИИ помнил историю.
+        Функция для загрузки истории сообщений, что бы ИИ помнил историю.
     """
     client = request.client.host
     return load_msg(client)
@@ -28,7 +45,7 @@ def load_messages(request):
 
 def get_user_ip(request: Request):
     """
-    Функция берет user id из request
+        Функция берет user id из request
     """
     client_ip = request.client.host
     if check_db_max_count_ip(client_ip):

@@ -1,22 +1,13 @@
 import openai
 import uvicorn
 from fastapi import FastAPI, Request, Depends
-from fastapi.middleware.cors import CORSMiddleware
 
-from tools import load_messages, save_messages, get_user_ip
+from tools import load_messages, save_messages, get_user_ip, add_middleware
 from config import API_KEY
 
 openai.api_key = API_KEY
 app = FastAPI()
-origins = ["*"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+add_middleware(app)
 
 
 @app.get('/api/v1/')
