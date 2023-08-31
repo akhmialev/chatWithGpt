@@ -7,6 +7,13 @@ const loginButton = document.getElementById('login-button');
 const registerButton = document.getElementById('register-button');
 const messageOverlay = document.getElementById('message-overlay');
 const closeButton = document.getElementById('close-button');
+const registrationButton = document.getElementById('register-button');
+const registrationOverlay = document.getElementById('registration-overlay');
+const registerSubmitButton = document.getElementById('register-submit-button');
+const registrationEmailInput = document.getElementById('registration-email');
+const registrationPasswordInput = document.getElementById('registration-password');
+const closeRegistrationButton = document.getElementById('close-registration-button');
+
 
 function sendMessage() {
     const userMessage = messageInput.value;
@@ -15,15 +22,15 @@ function sendMessage() {
     chatLog.innerHTML += `<div><strong>Вы:</strong> ${userMessage}</div>`;
     messageInput.value = '';
 
-    loadingIndicator.style.display = 'block'; // Показать индикатор загрузки
+    loadingIndicator.style.display = 'block';
 
-    // Замените URL на свой API URL
+    // Replace the URL with your API URL
     fetch(`http://127.0.0.1:8000/api/v1/?msg=${encodeURIComponent(userMessage)}`)
         .then(response => response.json())
         .then(data => {
-            if (data.message === "Limit exceeded") {
-                authButtonContainer.style.display = 'block'; // Показать контейнер с кнопками
-                showMessageOverlay(); // Показать сообщение о регистрации/входе
+            if (data.message === 'Limit exceeded') {
+                authButtonContainer.style.display = 'block';
+                showMessageOverlay("У вас закончились бесплатные запросы. Зарегистрируйтесь или войдите");
             } else {
                 chatLog.innerHTML += `<div><strong>Ассистент:</strong> ${data.message}</div>`;
                 chatLog.scrollTop = chatLog.scrollHeight;
@@ -31,45 +38,97 @@ function sendMessage() {
         })
         .catch(error => console.error('Ошибка при запросе:', error))
         .finally(() => {
-            loadingIndicator.style.display = 'none'; // Скрыть индикатор загрузки
+            loadingIndicator.style.display = 'none';
         });
 }
 
-function showMessageOverlay() {
+function showMessageOverlay(message) {
     messageOverlay.style.display = 'flex';
-    closeButton.focus(); // Передаем фокус на кнопку "Закрыть" в окне
+    const messageText = document.querySelector('.message-text');
+    messageText.textContent = message;
+    closeButton.focus();
 }
 
 function hideMessageOverlay() {
     messageOverlay.style.display = 'none';
 }
 
-// Обработчик нажатия Enter на поле ввода сообщения
 messageInput.addEventListener('keydown', event => {
     if (event.key === 'Enter') {
-        event.preventDefault(); // Предотвращаем стандартное поведение (отправку формы)
-        sendMessage(); // Вызываем функцию отправки сообщения
+        event.preventDefault();
+        sendMessage();
     }
 });
 
-// Обработчик кнопки "Отправить"
 sendButton.addEventListener('click', sendMessage);
 
-// Обработчики для кнопок Вход и Регистрация
 loginButton.addEventListener('click', () => {
     showMessageOverlay();
 });
 
-registerButton.addEventListener('click', () => {
-    showMessageOverlay();
+registrationButton.addEventListener('click', () => {
+    registrationOverlay.style.display = 'flex';
+    registrationEmailInput.value = '';
+    registrationPasswordInput.value = '';
+    registrationEmailInput.focus();
+
+    // Очищаем текст сообщения и убираем фокус с кнопки
+    const messageText = document.querySelector('.message-text');
+    messageText.textContent = '';
+    registerSubmitButton.disabled = true;
+    registerSubmitButton.style.opacity = 0.5;
 });
 
-// Обработчик кнопки "Закрыть" в окне сообщения
+registrationEmailInput.addEventListener('input', () => {
+    checkFormValidity();
+});
+
+registrationPasswordInput.addEventListener('input', () => {
+    checkFormValidity();
+});
+
+function checkFormValidity() {
+    const email = registrationEmailInput.value;
+    const password = registrationPasswordInput.value;
+    const isValid = email.trim() !== '' && password.trim() !== '';
+
+    registerSubmitButton.disabled = !isValid;
+    registerSubmitButton.style.opacity = isValid ? 1 : 0.5;
+}
+
+registerSubmitButton.addEventListener('click', () => {
+    const email = registrationEmailInput.value;
+    const password = registrationPasswordInput.value;
+
+    const formData = new URLSearchParams();
+    formData.append('email', email);
+    formData.append('password', password);
+
+    fetch('http://127.0.0.1:8000/api/v1/register/', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        const message = data.message;
+        showMessageOverlay(message);
+    })
+    .catch(error => console.error('Ошибка при регистрации:', error))
+    .finally(() => {
+        registrationOverlay.style.display = 'none';
+    });
+});
+
+function closeRegistrationOverlay() {
+    registrationOverlay.style.display = 'none';
+}
+closeRegistrationButton.addEventListener('click', () => {
+    closeRegistrationOverlay();
+});
 closeButton.addEventListener('click', hideMessageOverlay);
 
-// Обработчик нажатия Enter для кнопки закрытия
 closeButton.addEventListener('keydown', event => {
     if (event.key === 'Enter') {
-        hideMessageOverlay(); // Вызываем функцию закрытия окна
+        hideMessageOverlay();
     }
 });
