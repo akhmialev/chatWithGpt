@@ -71,7 +71,23 @@ def save_msg(ip, messages_to_add):
     collection.update_one(query, update=update_query)
 
 
+def check_email(email):
+    db = connect_to_db()
+    collection = db.get_collection('users')
+    query = {'email': str(email)}
+    email = collection.find_one(query)
+    if email:
+        return True
+    else:
+        return False
+
+
 def create_new_user(email, password):
+    """
+        Функция создает нового пользователя в ДБ
+    :param email: почта
+    :param password: пароль
+    """
     db = connect_to_db()
     collection = db.get_collection('users')
     data = {
@@ -85,4 +101,4 @@ def create_new_user(email, password):
         ]
     }
     collection.insert_one(data)
-    return True
+    return {'message': 'Success'}
