@@ -69,3 +69,20 @@ def save_msg(ip, messages_to_add):
     query = {'ip': ip}
     update_query = {"$push": {"messages": {"$each": messages_to_add}}}
     collection.update_one(query, update=update_query)
+
+
+def create_new_user(email, password):
+    db = connect_to_db()
+    collection = db.get_collection('users')
+    data = {
+        'email': email,
+        'password': password,
+        'chat': [
+            {
+                'chat_name': '',
+                'messages': []
+            }
+        ]
+    }
+    collection.insert_one(data)
+    return True

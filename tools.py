@@ -1,7 +1,9 @@
+import hashlib
+
 from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from db import check_db_max_count_ip, load_msg, save_msg
+from db import check_db_max_count_ip, load_msg, save_msg, create_new_user
 
 
 def add_middleware(app):
@@ -52,3 +54,16 @@ def get_user_ip(request: Request):
         return True
     else:
         return False
+
+
+def hash_password(password):
+    sha256_hash = hashlib.sha256()
+    sha256_hash.update(password.encode('utf-8'))
+    encrypted_password = sha256_hash.hexdigest()
+    return encrypted_password
+
+
+def register(email, password):
+    password = hash_password(password)
+    if create_new_user(email, password):
+        return True

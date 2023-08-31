@@ -2,7 +2,7 @@ import openai
 import uvicorn
 from fastapi import FastAPI, Request, Depends
 
-from tools import load_messages, save_messages, get_user_ip, add_middleware
+from tools import load_messages, save_messages, get_user_ip, add_middleware, register
 from config import API_KEY
 
 openai.api_key = API_KEY
@@ -32,6 +32,15 @@ def get_request(msg: str, request: Request, message_count: int = Depends(get_use
     save_messages(request, msg, answer)
 
     return {'message': answer}
+
+
+@app.post('/api/v1/register/')
+def registration(email: str, password: str):
+    if register(email, password):
+        return {'message': 'register success'}
+    else:
+        return {'message': 'error'}
+
 
 
 if __name__ == '__main__':
