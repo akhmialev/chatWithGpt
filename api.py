@@ -1,6 +1,6 @@
 import openai
 import uvicorn
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, Form
 
 from chat import load_messages, save_messages, register
 from tools import add_middleware, get_user_ip
@@ -36,7 +36,7 @@ def get_request(msg: str, request: Request, message_count: int = Depends(get_use
 
 
 @app.post('/api/v1/register/')
-def registration(email: str, password: str):
+def registration(email: str = Form(...), password: str = Form(...)):
     """
         Апи для регистрации новых пользователей
     :param email: почта
