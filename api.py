@@ -1,6 +1,6 @@
 import openai
 import uvicorn
-from fastapi import FastAPI, Request, Depends, Form
+from fastapi import FastAPI, Request, Depends, Form, Header
 
 from chat import load_messages, save_messages, register
 from tools import add_middleware, get_user_ip
@@ -44,6 +44,11 @@ def registration(email: str = Form(...), password: str = Form(...)):
     """
     response = register(email, password)
     return response
+
+
+@app.get('/api/v1/auth_chat')
+def auth_chat(msg: str, Authorization: str = Header(...)):
+    print(Authorization)
 
 
 if __name__ == '__main__':
