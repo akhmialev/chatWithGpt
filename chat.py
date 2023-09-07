@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from db import load_msg, save_msg, create_new_user, check_email
-from tools import hash_password
+from tools import hash_password, create_access_token
+from config import ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 def save_messages(request, msg, answer):
@@ -35,5 +38,9 @@ def register(email, password):
     if check_email(email):
         return {'message': 'This email is already in use'}
     else:
-        response = create_new_user(email, password)
-        return response
+        create_new_user(email, password)
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={'sub': email}, expire_delta=access_token_expires
+        )
+        return {'access_token': access_token, 'token_type': 'bearer'}
