@@ -101,4 +101,4 @@ def create_new_user(email, password):
         ]
     }
     collection.insert_one(data)
-    return {'message': 'Success'}
+
