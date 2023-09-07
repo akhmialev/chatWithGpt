@@ -1,8 +1,11 @@
+import jwt
 from fastapi import Request
 import hashlib
+from datetime import timedelta, datetime
 
 from fastapi.middleware.cors import CORSMiddleware
 from db import check_db_max_count_ip
+from config import SECRET_KEY, ALGORITHM
 
 
 def add_middleware(app):
@@ -41,3 +44,15 @@ def hash_password(password):
     sha256_hash.update(password.encode('utf-8'))
     encrypted_password = sha256_hash.hexdigest()
     return encrypted_password
+
+
+def create_access_token(data: dict, expire_delta: timedelta):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + expire_delta
+    to_encode.update({'exp': expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+
+def check_token():
+    ...
