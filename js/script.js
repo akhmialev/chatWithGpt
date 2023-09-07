@@ -14,7 +14,6 @@ const registrationEmailInput = document.getElementById('registration-email');
 const registrationPasswordInput = document.getElementById('registration-password');
 const closeRegistrationButton = document.getElementById('close-registration-button');
 
-
 function sendMessage() {
     const userMessage = messageInput.value;
     if (userMessage.trim() === '') return;
@@ -72,7 +71,6 @@ registrationButton.addEventListener('click', () => {
     registrationPasswordInput.value = '';
     registrationEmailInput.focus();
 
-    // Очищаем текст сообщения и убираем фокус с кнопки
     const messageText = document.querySelector('.message-text');
     messageText.textContent = '';
     registerSubmitButton.disabled = true;
@@ -112,6 +110,7 @@ registerSubmitButton.addEventListener('click', () => {
     .then(data => {
         const message = data.message;
         showMessageOverlay(message);
+        handleSuccessfulRegistration(); // Добавляем этот вызов
     })
     .catch(error => console.error('Ошибка при регистрации:', error))
     .finally(() => {
@@ -132,3 +131,13 @@ closeButton.addEventListener('keydown', event => {
         hideMessageOverlay();
     }
 });
+
+function handleSuccessfulRegistration() {
+    const loginButton = document.getElementById('login-button');
+    const registerButton = document.getElementById('register-button');
+    const logoutButton = document.getElementById('logout-button');
+
+    loginButton.style.display = 'none';
+    registerButton.style.display = 'none';
+    logoutButton.style.display = 'block';
+}
